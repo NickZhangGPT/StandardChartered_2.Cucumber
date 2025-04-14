@@ -1,0 +1,97 @@
+package stepdefinitions;
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.util.List;
+import java.io.File;
+import org.apache.commons.io.FileUtils;
+
+public class StepDefinitions {
+    private WebDriver driver;
+    private String screenshotPath = "screenshots/";
+
+    public StepDefinitions() {
+        // 如果 ChromeDriver 未添加到环境变量，可在此指定路径
+        // System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+        driver = new ChromeDriver();
+    }
+
+    @Given("打开网页 {string}")
+    public void openWebPage(String url) {
+        driver.get(url);
+    }
+
+    @When("在 {string} 选项组中选择 {string}")
+    public void selectOption(String optionGroup, String option) {
+        WebElement element = driver.findElement(By.xpath("//label[contains(text(), '" + optionGroup + "')]/following-sibling::select"));
+        element.sendKeys(option);
+    }
+
+    @Then("将第一页进行截图")
+    public void takeScreenshotFirstPage() {
+        takeScreenshot("first_page.png");
+    }
+
+    @Given("点击 {string} 按钮")
+    public void clickButton(String buttonText) {
+        WebElement button = driver.findElement(By.xpath("//button[contains(text(), '" + buttonText + "')]"));
+        button.click();
+    }
+
+    @When("填写以下内容:")
+    public void fillForm(List<List<String>> dataTable) {
+        for (List<String> row : dataTable) {
+            String field = row.get(0);
+            String value = row.get(1);
+            WebElement element = driver.findElement(By.xpath("//label[contains(text(), '" + field + "')]/following-sibling::input"));
+            element.sendKeys(value);
+        }
+    }
+
+    @Then("将第二页进行截图")
+    public void takeScreenshotSecondPage() {
+        takeScreenshot("second_page.png");
+    }
+
+    @Then("将第三页进行截图")
+    public void takeScreenshotThirdPage() {
+        takeScreenshot("third_page.png");
+    }
+
+    @When("判断提交后弹框信息")
+    public void checkSubmitMessage() {
+        try {
+            WebElement alert = driver.switchTo().alert();
+            String message = alert.getText();
+            System.out.println("弹框信息: " + message);
+            alert.accept();
+        } catch (NoAlertPresentException e) {
+            System.out.println("未检测到弹框");
+        }
+    }
+
+    @Then("将提交结果页进行截图")
+    public void takeScreenshotSubmitPage() {
+        takeScreenshot("submit_page.png");
+    }
+
+    private void takeScreenshot(String fileName) {
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.copyFile(screenshot, new File(screenshotPath + fileName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 清理资源（可选）
+    @io.cucumber.java.After
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}
