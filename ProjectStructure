@@ -1,0 +1,22 @@
+project-root
+│
+├── src
+│   └── test
+│       ├── java
+│       │   └── stepdefinitions
+│       │       └── StepDefinitions.java
+│       └── resources
+│           └── features
+│               └── enterprise_resumption.feature
+│
+├── target
+│   └── cucumber-reports.html
+│
+├── screenshots
+│   ├── first_page.png
+│   ├── second_page.png
+│   ├── third_page.png
+│   └── submit_page.png
+│
+├── pom.xml
+└── TestRunner.java
